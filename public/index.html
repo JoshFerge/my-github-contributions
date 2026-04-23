@@ -6,12 +6,12 @@
     <title>GitHub contributions × AI tool launches</title>
     <meta
       name="description"
-      content="A monthly ledger of any GitHub user's contributions, overlaid with the launch dates of AI coding tools."
+      content="Chart any GitHub user's monthly contributions, overlaid with the launch dates of major AI coding tools."
     />
     <meta property="og:title" content="GitHub contributions × AI tool launches" />
     <meta
       property="og:description"
-      content="Paste a GitHub username. See their monthly contributions since 2021, annotated with AI tool launches."
+      content="Paste a GitHub username. See their monthly contributions since 2021, overlaid with AI tool launches."
     />
     <meta property="og:type" content="website" />
     <meta name="twitter:card" content="summary_large_image" />
@@ -20,22 +20,19 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap"
       rel="stylesheet"
     />
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.6/dist/chart.umd.min.js"></script>
     <style>
       :root {
-        --paper: #f1ead9;
-        --paper-deep: #e8dfc6;
+        --paper: #f4eede;
         --ink: #14110e;
-        --ink-soft: #4a4237;
-        --ink-faint: #847866;
-        --rule: #1a1714;
-        --rule-soft: rgba(26, 23, 20, 0.18);
+        --ink-soft: #5a5349;
+        --ink-faint: #8a7f70;
+        --rule: rgba(20, 17, 14, 0.12);
         --accent: #c8344a;
-        --accent-soft: rgba(200, 52, 74, 0.16);
-        --marker: rgba(26, 23, 20, 0.55);
+        --accent-soft: rgba(200, 52, 74, 0.12);
         --sans: "Geist", ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
         --mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
       }
@@ -44,124 +41,74 @@
       html, body { margin: 0; padding: 0; }
 
       body {
-        background:
-          radial-gradient(1400px 900px at 85% -10%, rgba(200, 52, 74, 0.08), transparent 60%),
-          radial-gradient(1000px 700px at -10% 110%, rgba(26, 23, 20, 0.07), transparent 60%),
-          var(--paper);
+        background: var(--paper);
         color: var(--ink);
         font-family: var(--sans);
         font-feature-settings: "ss01", "ss02", "cv11";
         line-height: 1.5;
         min-height: 100vh;
-        overflow-x: hidden;
         -webkit-font-smoothing: antialiased;
         -moz-osx-font-smoothing: grayscale;
       }
 
-      /* Subtle paper grain overlay */
-      body::before {
-        content: "";
-        position: fixed; inset: 0;
-        pointer-events: none;
-        background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.08  0 0 0 0 0.07  0 0 0 0 0.05  0 0 0 0.08 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
-        opacity: 0.6;
-        mix-blend-mode: multiply;
-        z-index: 1;
-      }
-
-      main { position: relative; z-index: 2; }
-
-      /* ---------- Masthead ---------- */
-      .masthead {
-        max-width: 1200px;
+      main {
+        max-width: 1080px;
         margin: 0 auto;
-        padding: 20px 32px 16px;
-        border-bottom: 1px solid var(--rule);
-      }
-      .masthead-top {
-        display: flex;
-        justify-content: space-between;
-        align-items: baseline;
-        font-family: var(--mono);
-        font-size: 10px;
-        letter-spacing: 0.12em;
-        text-transform: uppercase;
-        color: var(--ink-soft);
-        margin-bottom: 14px;
-      }
-      .masthead-top .dot {
-        width: 5px; height: 5px;
-        background: var(--accent);
-        border-radius: 50%;
-        display: inline-block;
-        margin-right: 6px;
-        vertical-align: middle;
+        padding: 48px 32px 64px;
       }
 
-      .title-block {
-        display: grid;
-        grid-template-columns: 1fr auto;
-        align-items: baseline;
-        gap: 24px;
+      /* ---------- Hero ---------- */
+      .hero {
+        text-align: center;
+        margin-bottom: 28px;
       }
       h1 {
         font-family: var(--sans);
         font-weight: 600;
-        font-size: clamp(20px, 2.4vw, 28px);
-        line-height: 1.15;
+        font-size: clamp(22px, 3vw, 32px);
+        line-height: 1.2;
         letter-spacing: -0.02em;
-        margin: 0;
+        margin: 0 0 8px;
         color: var(--ink);
       }
-      h1 .accent { color: var(--accent); }
-
-      .subtitle {
-        font-family: var(--sans);
-        font-weight: 400;
-        font-size: 13px;
-        line-height: 1.4;
+      .tagline {
+        font-size: 15px;
         color: var(--ink-soft);
-        max-width: 360px;
-        justify-self: end;
-        text-align: right;
         margin: 0;
+        max-width: 560px;
+        margin-left: auto;
+        margin-right: auto;
       }
 
       /* ---------- Search ---------- */
-      .search-section {
-        max-width: 1200px;
-        margin: 0 auto;
-        padding: 14px 32px 10px;
-      }
-      .search-label {
-        font-family: var(--mono);
-        font-size: 9px;
-        letter-spacing: 0.18em;
-        text-transform: uppercase;
-        color: var(--ink-faint);
-        margin-bottom: 4px;
-        display: block;
-      }
-      form {
+      .search {
+        max-width: 640px;
+        margin: 0 auto 16px;
         display: flex;
-        gap: 0;
         align-items: stretch;
-        border-bottom: 1px solid var(--rule);
-        padding: 0;
+        background: #fff;
+        border: 1px solid var(--rule);
+        border-radius: 12px;
+        box-shadow: 0 1px 2px rgba(20, 17, 14, 0.04);
+        overflow: hidden;
+        transition: box-shadow 0.2s ease, border-color 0.2s ease;
+      }
+      .search:focus-within {
+        border-color: var(--ink);
+        box-shadow: 0 4px 16px rgba(20, 17, 14, 0.08);
       }
       .input-wrap {
         flex: 1;
         display: flex;
-        align-items: baseline;
-        gap: 8px;
-        padding: 8px 4px;
+        align-items: center;
+        gap: 6px;
+        padding: 0 16px;
+        min-width: 0;
       }
       .at-symbol {
-        font-family: var(--sans);
-        font-weight: 500;
         font-size: 18px;
-        color: var(--accent);
-        line-height: 1;
+        color: var(--ink-faint);
+        font-weight: 500;
       }
       input[type="text"] {
         flex: 1;
@@ -169,10 +116,10 @@
         background: transparent;
         font-family: var(--sans);
         font-weight: 500;
-        font-size: 18px;
+        font-size: 17px;
         letter-spacing: -0.01em;
         color: var(--ink);
-        padding: 0;
+        padding: 16px 0;
         outline: none;
         min-width: 0;
       }
@@ -182,44 +129,75 @@
       }
       button[type="submit"] {
         border: 0;
-        background: var(--ink);
-        color: var(--paper);
-        font-family: var(--mono);
+        background: var(--accent);
+        color: #fff;
+        font-family: var(--sans);
         font-weight: 600;
-        font-size: 11px;
-        letter-spacing: 0.18em;
-        text-transform: uppercase;
-        padding: 0 20px;
+        font-size: 15px;
+        letter-spacing: -0.005em;
+        padding: 0 24px;
         cursor: pointer;
-        transition: background 0.2s ease;
+        transition: background 0.18s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
       }
       button[type="submit"]:hover:not(:disabled) {
-        background: var(--accent);
+        background: #a8253b;
       }
       button[type="submit"]:disabled {
-        opacity: 0.4;
+        opacity: 0.5;
         cursor: progress;
+      }
+      button[type="submit"] .arrow {
+        transition: transform 0.2s ease;
+      }
+      button[type="submit"]:hover:not(:disabled) .arrow {
+        transform: translateX(3px);
+      }
+      .examples {
+        max-width: 640px;
+        margin: 0 auto 24px;
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        justify-content: center;
+        font-size: 13px;
+        color: var(--ink-faint);
+      }
+      .examples span { margin-right: 4px; }
+      .examples button.chip {
+        background: transparent;
+        border: 1px solid var(--rule);
+        color: var(--ink-soft);
+        font-family: var(--sans);
+        font-size: 13px;
+        padding: 4px 10px;
+        border-radius: 999px;
+        cursor: pointer;
+        transition: all 0.15s ease;
+      }
+      .examples button.chip:hover {
+        border-color: var(--ink);
+        color: var(--ink);
+        background: rgba(20, 17, 14, 0.04);
       }
 
       /* ---------- Controls ---------- */
       .controls {
-        max-width: 1200px;
-        margin: 0 auto;
-        padding: 12px 32px 12px;
         display: flex;
-        flex-wrap: wrap;
-        gap: 24px;
+        justify-content: center;
+        gap: 20px;
         align-items: center;
-        font-family: var(--mono);
-        font-size: 10px;
-        letter-spacing: 0.1em;
-        text-transform: uppercase;
+        font-family: var(--sans);
+        font-size: 13px;
         color: var(--ink-soft);
-        border-bottom: 1px solid var(--rule-soft);
+        margin-bottom: 20px;
+        flex-wrap: wrap;
       }
       .controls label {
         display: inline-flex;
-        gap: 8px;
+        gap: 6px;
         align-items: center;
         cursor: pointer;
         user-select: none;
@@ -227,63 +205,61 @@
       .controls input[type="checkbox"] {
         appearance: none;
         width: 14px; height: 14px;
-        border: 1.5px solid var(--ink);
-        background: transparent;
+        border: 1.5px solid var(--ink-soft);
+        background: #fff;
         cursor: pointer;
         position: relative;
-        border-radius: 0;
+        border-radius: 3px;
         margin: 0;
       }
       .controls input[type="checkbox"]:checked {
         background: var(--ink);
+        border-color: var(--ink);
       }
       .controls input[type="checkbox"]:checked::after {
         content: "";
         position: absolute;
-        left: 2.5px; top: -0.5px;
-        width: 4px; height: 9px;
-        border: solid var(--paper);
+        left: 3px; top: 0;
+        width: 4px; height: 8px;
+        border: solid #fff;
         border-width: 0 1.5px 1.5px 0;
         transform: rotate(45deg);
       }
       .controls select {
         appearance: none;
-        border: 0;
-        border-bottom: 1.5px solid var(--ink);
-        background: transparent;
-        font-family: var(--mono);
-        font-size: 11px;
-        letter-spacing: 0.1em;
-        text-transform: uppercase;
+        border: 1px solid var(--rule);
+        background: #fff;
+        font-family: var(--sans);
+        font-size: 13px;
         color: var(--ink);
-        padding: 2px 18px 2px 4px;
+        padding: 4px 24px 4px 10px;
+        border-radius: 6px;
         cursor: pointer;
-        background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='8' height='6'><path d='M1 1l3 3 3-3' stroke='%2314110e' stroke-width='1.2' fill='none'/></svg>");
+        background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6'><path d='M1 1l4 4 4-4' stroke='%2314110e' stroke-width='1.3' fill='none'/></svg>");
         background-repeat: no-repeat;
-        background-position: right 2px center;
+        background-position: right 8px center;
       }
 
-      /* ---------- Chart ---------- */
-      .chart-section {
-        max-width: 1200px;
-        margin: 0 auto;
-        padding: 16px 32px 16px;
+      /* ---------- Chart card ---------- */
+      .chart-card {
+        background: #fff;
+        border: 1px solid var(--rule);
+        border-radius: 14px;
+        padding: 20px 20px 16px;
+        box-shadow: 0 1px 2px rgba(20, 17, 14, 0.03);
       }
       .chart-head {
-        display: grid;
-        grid-template-columns: 1fr auto;
+        display: flex;
+        justify-content: space-between;
         align-items: baseline;
-        gap: 24px;
-        margin-bottom: 12px;
-        padding-bottom: 10px;
-        border-bottom: 1px solid var(--rule);
+        gap: 16px;
+        margin-bottom: 8px;
+        flex-wrap: wrap;
       }
       .chart-title {
         font-family: var(--sans);
         font-weight: 600;
-        font-size: 16px;
-        line-height: 1.2;
-        letter-spacing: -0.01em;
+        font-size: 15px;
         margin: 0;
         color: var(--ink);
       }
@@ -292,31 +268,20 @@
         font-weight: 400;
       }
       .chart-stats {
-        font-family: var(--mono);
-        font-size: 9px;
-        letter-spacing: 0.12em;
-        text-transform: uppercase;
+        font-size: 13px;
         color: var(--ink-soft);
-        text-align: right;
-        line-height: 1.4;
       }
       .chart-stats .big {
-        display: inline-block;
-        font-family: var(--sans);
         font-weight: 600;
-        font-size: 20px;
         color: var(--ink);
-        letter-spacing: -0.02em;
-        text-transform: none;
-        line-height: 1;
-        margin-right: 8px;
-        vertical-align: baseline;
+        font-size: 15px;
+        margin-right: 4px;
       }
 
       #chart-wrap {
         position: relative;
-        height: calc(100vh - 280px);
-        min-height: 320px;
+        height: calc(100vh - 340px);
+        min-height: 340px;
         max-height: 560px;
       }
       #status {
@@ -325,9 +290,7 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        font-family: var(--sans);
-        font-weight: 400;
-        font-size: 15px;
+        font-size: 14px;
         color: var(--ink-faint);
         text-align: center;
         padding: 0 32px;
@@ -337,164 +300,92 @@
 
       /* ---------- Share row ---------- */
       .share-row {
-        max-width: 1200px;
-        margin: 0 auto;
-        padding: 8px 32px 32px;
         display: flex;
+        justify-content: center;
         gap: 8px;
-        justify-content: flex-end;
-        flex-wrap: wrap;
+        margin-top: 16px;
       }
       .share-row button {
         background: transparent;
-        border: 1px solid var(--ink);
-        color: var(--ink);
-        font-family: var(--mono);
-        font-size: 11px;
+        border: 1px solid var(--rule);
+        color: var(--ink-soft);
+        font-family: var(--sans);
+        font-size: 13px;
         font-weight: 500;
-        letter-spacing: 0.15em;
-        text-transform: uppercase;
-        padding: 10px 16px;
+        padding: 6px 12px;
+        border-radius: 6px;
         cursor: pointer;
-        transition: all 0.2s ease;
+        transition: all 0.15s ease;
       }
       .share-row button:hover {
-        background: var(--ink);
-        color: var(--paper);
-      }
-
-      /* ---------- Legend (AI tool markers) ---------- */
-      .legend-section {
-        max-width: 1200px;
-        margin: 0 auto;
-        padding: 24px 32px 40px;
-        border-top: 1px solid var(--rule);
-      }
-      .legend-title {
-        font-family: var(--mono);
-        font-size: 11px;
-        letter-spacing: 0.2em;
-        text-transform: uppercase;
-        color: var(--ink-faint);
-        margin: 0 0 16px;
-      }
-      .legend-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-        gap: 0;
-        border-top: 1px solid var(--rule-soft);
-      }
-      .legend-item {
-        padding: 12px 16px 12px 0;
-        border-bottom: 1px solid var(--rule-soft);
-        display: grid;
-        grid-template-columns: 92px 1fr;
-        gap: 12px;
-        align-items: baseline;
-      }
-      .legend-date {
-        font-family: var(--mono);
-        font-size: 11px;
-        color: var(--accent);
-        letter-spacing: 0.05em;
-      }
-      .legend-label {
-        font-family: var(--sans);
-        font-size: 14px;
-        font-weight: 500;
+        border-color: var(--ink);
         color: var(--ink);
+        background: rgba(20, 17, 14, 0.04);
       }
 
       /* ---------- Footer ---------- */
       footer {
-        max-width: 1200px;
-        margin: 0 auto;
-        padding: 20px 32px 40px;
-        border-top: 1px solid var(--rule);
-        display: flex;
-        justify-content: space-between;
-        flex-wrap: wrap;
-        gap: 16px;
-        font-family: var(--mono);
-        font-size: 10px;
-        letter-spacing: 0.14em;
-        text-transform: uppercase;
+        margin-top: 40px;
+        text-align: center;
+        font-size: 12px;
         color: var(--ink-faint);
       }
       footer a {
-        color: var(--accent);
+        color: var(--ink-soft);
         text-decoration: none;
-        border-bottom: 1px solid currentColor;
+        border-bottom: 1px solid var(--rule);
       }
+      footer a:hover { color: var(--ink); border-bottom-color: var(--ink); }
 
-      /* ---------- Motion ---------- */
-      .reveal { opacity: 0; transform: translateY(12px); animation: rise 0.9s cubic-bezier(0.2, 0.7, 0.2, 1) forwards; }
-      .reveal.d1 { animation-delay: 0.05s; }
-      .reveal.d2 { animation-delay: 0.15s; }
-      .reveal.d3 { animation-delay: 0.25s; }
-      .reveal.d4 { animation-delay: 0.35s; }
-      .reveal.d5 { animation-delay: 0.45s; }
-      @keyframes rise {
-        to { opacity: 1; transform: translateY(0); }
-      }
-
-      @media (max-width: 720px) {
-        .masthead, .search-section, .controls, .chart-section, .share-row, .legend-section, footer {
-          padding-left: 16px; padding-right: 16px;
-        }
-        .title-block { grid-template-columns: 1fr; gap: 8px; }
-        .subtitle { text-align: left; justify-self: start; max-width: none; }
-        .chart-head { grid-template-columns: 1fr; gap: 6px; }
-        .chart-stats { text-align: left; }
-        #chart-wrap { height: 360px; max-height: none; }
+      @media (max-width: 640px) {
+        main { padding: 28px 16px 48px; }
+        .hero { margin-bottom: 20px; }
+        .search { border-radius: 10px; }
+        button[type="submit"] { padding: 0 16px; font-size: 14px; }
+        .chart-head { flex-direction: column; gap: 4px; }
+        #chart-wrap { height: 420px; max-height: none; }
       }
     </style>
   </head>
   <body>
     <main>
-      <!-- MASTHEAD -->
-      <header class="masthead reveal">
-        <div class="masthead-top">
-          <span><span class="dot"></span>GitHub GraphQL · live</span>
-          <span id="today"></span>
-        </div>
-        <div class="title-block">
-          <h1>GitHub contributions<span class="accent">,</span> by month — overlaid with AI tool launches<span class="accent">.</span></h1>
-          <p class="subtitle">
-            Monthly contributions for any public GitHub user, plotted against when the major AI coding tools shipped.
-          </p>
-        </div>
-      </header>
-
-      <!-- SEARCH -->
-      <section class="search-section reveal d1">
-        <label class="search-label" for="username">GitHub handle</label>
-        <form id="form">
-          <div class="input-wrap">
-            <span class="at-symbol">@</span>
-            <input
-              id="username"
-              type="text"
-              autocomplete="off"
-              autocapitalize="none"
-              spellcheck="false"
-              placeholder="joshferge"
-              required
-            />
-          </div>
-          <button type="submit" id="submit">Chart it</button>
-        </form>
+      <section class="hero">
+        <h1>GitHub contributions × AI tool launches</h1>
+        <p class="tagline">
+          Chart any GitHub user's monthly contributions since 2021, overlaid with when the major AI coding tools shipped.
+        </p>
       </section>
 
-      <!-- CONTROLS -->
-      <div class="controls reveal d2">
+      <form class="search" id="form">
+        <div class="input-wrap">
+          <span class="at-symbol">@</span>
+          <input
+            id="username"
+            type="text"
+            autocomplete="off"
+            autocapitalize="none"
+            spellcheck="false"
+            placeholder="GitHub username"
+            required
+          />
+        </div>
+        <button type="submit" id="submit">
+          Chart it <span class="arrow">→</span>
+        </button>
+      </form>
+
+      <div class="examples">
+        <span>Try:</span>
+        <button type="button" class="chip" data-user="torvalds">torvalds</button>
+        <button type="button" class="chip" data-user="gaearon">gaearon</button>
+        <button type="button" class="chip" data-user="sindresorhus">sindresorhus</button>
+        <button type="button" class="chip" data-user="JoshFerge">JoshFerge</button>
+      </div>
+
+      <div class="controls">
         <label>
           <input type="checkbox" id="toggle-markers" checked />
           AI tool markers
-        </label>
-        <label>
-          <input type="checkbox" id="toggle-raw" />
-          Show raw monthly
         </label>
         <label>
           Smoothing
@@ -505,20 +396,9 @@
             <option value="12">12 mo</option>
           </select>
         </label>
-        <label>
-          From
-          <select id="fromYear">
-            <option value="2019">2019</option>
-            <option value="2020">2020</option>
-            <option value="2021" selected>2021</option>
-            <option value="2022">2022</option>
-            <option value="2023">2023</option>
-          </select>
-        </label>
       </div>
 
-      <!-- CHART -->
-      <section class="chart-section reveal d3">
+      <section class="chart-card">
         <div class="chart-head">
           <h2 class="chart-title" id="chart-title">
             <span class="muted">Monthly contributions</span>
@@ -533,25 +413,18 @@
           <canvas id="chart"></canvas>
           <div id="status"></div>
         </div>
+
+        <div class="share-row" id="share-row" style="display:none;">
+          <button type="button" id="copy-link">Copy link</button>
+          <button type="button" id="download-png">Download PNG</button>
+        </div>
       </section>
 
-      <!-- SHARE -->
-      <div class="share-row reveal d4">
-        <button type="button" id="copy-link">Copy link</button>
-        <button type="button" id="download-png">Download PNG</button>
-      </div>
-
-      <!-- LEGEND -->
-      <section class="legend-section reveal d5">
-        <p class="legend-title">AI coding tool launches</p>
-        <div class="legend-grid" id="legend-grid"></div>
-      </section>
-
-      <!-- FOOTER -->
       <footer>
-        <span>Data: <a href="https://docs.github.com/en/graphql" target="_blank" rel="noopener">GitHub GraphQL</a> — contributions calendar</span>
-        <span>Includes commits, PRs, issues, reviews, repo creations</span>
-        <span>Built with Cloudflare Workers</span>
+        Data from the public
+        <a href="https://docs.github.com/en/graphql" target="_blank" rel="noopener">GitHub GraphQL</a>.
+        Source on
+        <a href="https://github.com/JoshFerge/my-github-contributions" target="_blank" rel="noopener">GitHub</a>.
       </footer>
     </main>
 
@@ -567,17 +440,21 @@
       const totalContribEl = $("total-contributions");
       const totalMonthsEl = $("total-months");
       const toggleMarkers = $("toggle-markers");
-      const toggleRaw = $("toggle-raw");
       const smoothing = $("smoothing");
-      const fromYear = $("fromYear");
       const copyLinkBtn = $("copy-link");
       const downloadBtn = $("download-png");
-      const legendGrid = $("legend-grid");
-      const todayEl = $("today");
+      const shareRow = $("share-row");
 
-      todayEl.textContent = new Date().toLocaleDateString("en-US", {
-        year: "numeric", month: "long", day: "numeric",
-      });
+      // Curated subset — only the most recognizable launches, to keep the chart readable.
+      const KEY_MARKERS = new Set([
+        "2022-06-21", // Copilot GA
+        "2022-11-30", // ChatGPT launch
+        "2023-03-14", // GPT-4
+        "2023-10-10", // Cursor launch
+        "2024-06-20", // Claude 3.5 Sonnet
+        "2025-02-24", // Claude Code preview
+        "2025-05-16", // OpenAI Codex preview
+      ]);
 
       let chart = null;
       let lastData = null;
@@ -611,73 +488,60 @@
         setStatus("");
         const labels = data.series.map((p) => monthLabel(p.month));
         const smoothed = data.series.map((p) => p.smoothed);
-        const raw = data.series.map((p) => p.count);
 
         const smoothingVal = smoothing.value;
-        const primaryLabel = smoothingVal === "1"
+        const seriesLabel = smoothingVal === "1"
           ? "monthly contributions"
-          : `${smoothingVal}-month moving average`;
+          : `${smoothingVal}-mo moving avg`;
 
         const datasets = [
           {
-            label: primaryLabel,
+            label: seriesLabel,
             data: smoothed,
             borderColor: "#c8344a",
-            backgroundColor: "rgba(200, 52, 74, 0.14)",
+            backgroundColor: "rgba(200, 52, 74, 0.1)",
             fill: true,
             tension: 0.38,
             pointRadius: 0,
             pointHoverRadius: 5,
             pointHoverBackgroundColor: "#c8344a",
-            pointHoverBorderColor: "#f1ead9",
+            pointHoverBorderColor: "#fff",
             pointHoverBorderWidth: 2,
             borderWidth: 2.5,
           },
         ];
-        if (toggleRaw.checked && smoothingVal !== "1") {
-          datasets.push({
-            label: "raw monthly",
-            data: raw,
-            borderColor: "rgba(20, 17, 14, 0.55)",
-            backgroundColor: "transparent",
-            borderDash: [3, 4],
-            tension: 0,
-            pointRadius: 0,
-            pointHoverRadius: 3,
-            borderWidth: 1.25,
-            fill: false,
-          });
-        }
 
         const markerAnnotations = {};
         if (toggleMarkers.checked && data.markers) {
-          let offset = 0;
+          let i = 0;
           for (const m of data.markers) {
+            if (!KEY_MARKERS.has(m.date)) continue;
             const ym = m.date.slice(0, 7);
             const idx = monthIndex(data.series, ym);
             if (idx === -1) continue;
-            // Alternate label y-position to reduce overlap.
-            offset = (offset + 1) % 3;
-            markerAnnotations[`m-${m.date}-${m.label}`] = {
+            // Alternate label y-position: top, middle, bottom.
+            const position = ["start", "end", "start", "end"][i % 4];
+            markerAnnotations[`m-${m.date}`] = {
               type: "line",
               xMin: idx,
               xMax: idx,
-              borderColor: "rgba(20, 17, 14, 0.55)",
+              borderColor: "rgba(20, 17, 14, 0.32)",
               borderWidth: 1,
-              borderDash: [2, 3],
+              borderDash: [3, 4],
               label: {
                 display: true,
                 content: m.label,
-                position: offset === 0 ? "start" : offset === 1 ? "center" : "end",
-                backgroundColor: "rgba(241, 234, 217, 0.95)",
+                position,
+                backgroundColor: "rgba(255, 255, 255, 0.96)",
                 color: "#14110e",
-                font: { family: FONT_MONO, size: 9, weight: "500" },
-                padding: { top: 3, bottom: 3, left: 5, right: 5 },
-                borderColor: "rgba(20, 17, 14, 0.25)",
+                font: { family: FONT_SANS, size: 11, weight: "500" },
+                padding: { top: 3, bottom: 3, left: 6, right: 6 },
+                borderColor: "rgba(20, 17, 14, 0.15)",
                 borderWidth: 1,
-                borderRadius: 0,
+                borderRadius: 4,
               },
             };
+            i++;
           }
         }
 
@@ -691,54 +555,36 @@
             scales: {
               x: {
                 grid: { display: false },
-                border: { color: "#14110e", width: 1.5 },
+                border: { color: "rgba(20, 17, 14, 0.2)", width: 1 },
                 ticks: {
-                  maxRotation: 50,
-                  minRotation: 45,
-                  autoSkipPadding: 20,
-                  color: "#4a4237",
-                  font: { family: FONT_MONO, size: 10 },
+                  maxRotation: 0,
+                  autoSkipPadding: 24,
+                  color: "#5a5349",
+                  font: { family: FONT_SANS, size: 11 },
                 },
               },
               y: {
                 beginAtZero: true,
-                grid: { color: "rgba(20, 17, 14, 0.08)", drawTicks: false },
-                border: { color: "#14110e", width: 1.5 },
+                grid: { color: "rgba(20, 17, 14, 0.06)", drawTicks: false },
+                border: { display: false },
                 ticks: {
-                  color: "#4a4237",
-                  font: { family: FONT_MONO, size: 10 },
+                  color: "#8a7f70",
+                  font: { family: FONT_SANS, size: 11 },
                   padding: 8,
-                },
-                title: {
-                  display: true,
-                  text: "CONTRIBUTIONS",
-                  color: "#847866",
-                  font: { family: FONT_MONO, size: 10, weight: "600" },
+                  maxTicksLimit: 6,
                 },
               },
             },
             plugins: {
-              legend: {
-                position: "top",
-                align: "end",
-                labels: {
-                  color: "#14110e",
-                  font: { family: FONT_MONO, size: 10, weight: "500" },
-                  usePointStyle: true,
-                  pointStyle: "rectRounded",
-                  padding: 18,
-                },
-              },
+              legend: { display: false },
               tooltip: {
                 backgroundColor: "#14110e",
-                titleColor: "#f1ead9",
-                bodyColor: "#f1ead9",
-                titleFont: { family: FONT_MONO, size: 11, weight: "600" },
+                titleColor: "#f4eede",
+                bodyColor: "#f4eede",
+                titleFont: { family: FONT_SANS, size: 12, weight: "600" },
                 bodyFont: { family: FONT_SANS, size: 13 },
-                borderColor: "#c8344a",
-                borderWidth: 1,
-                cornerRadius: 0,
-                padding: 12,
+                cornerRadius: 6,
+                padding: 10,
                 displayColors: false,
                 callbacks: {
                   title: (items) => items[0]?.label ?? "",
@@ -755,9 +601,10 @@
         const total = data.series.reduce((s, p) => s + p.count, 0);
         titleEl.innerHTML = `
           <span>@${escapeHtml(data.username)}</span>
-          <span class="muted">— monthly contributions</span>
+          <span class="muted">· ${seriesLabel}</span>
         `;
         statsEl.style.display = "block";
+        shareRow.style.display = "flex";
         totalContribEl.textContent = total.toLocaleString();
         totalMonthsEl.textContent = data.series.length;
       }
@@ -768,43 +615,26 @@
         }[c]));
       }
 
-      function renderLegend(markers) {
-        legendGrid.innerHTML = markers
-          .map((m) => {
-            const d = new Date(m.date + "T00:00:00Z");
-            const dateStr = d.toLocaleDateString("en-US", {
-              year: "numeric", month: "short", day: "2-digit", timeZone: "UTC",
-            });
-            return `
-              <div class="legend-item">
-                <span class="legend-date">${dateStr}</span>
-                <span class="legend-label">${escapeHtml(m.label)}</span>
-              </div>
-            `;
-          })
-          .join("");
-      }
-
       async function load(username) {
         setStatus(`Loading @${username}…`);
         submit.disabled = true;
         try {
           const params = new URLSearchParams({
             username,
-            from: fromYear.value,
+            from: "2021",
             smoothing: smoothing.value,
           });
           const res = await fetch(`/api/chart?${params}`);
           const body = await res.json();
           if (!res.ok) throw new Error(body.error || `HTTP ${res.status}`);
           if (!body.series?.length) {
-            setStatus(`No contributions found for @${username} in this range.`, true);
+            setStatus(`No contributions found for @${username}.`, true);
             if (chart) { chart.destroy(); chart = null; }
             statsEl.style.display = "none";
+            shareRow.style.display = "none";
             return;
           }
           renderChart(body);
-          renderLegend(body.markers || []);
           const u = new URL(window.location.href);
           u.searchParams.set("u", username);
           history.replaceState(null, "", u.toString());
@@ -813,6 +643,7 @@
           setStatus(err.message || "Something went wrong.", true);
           if (chart) { chart.destroy(); chart = null; }
           statsEl.style.display = "none";
+          shareRow.style.display = "none";
         } finally {
           submit.disabled = false;
         }
@@ -825,9 +656,18 @@
         load(v);
       });
 
-      for (const el of [toggleMarkers, toggleRaw, smoothing, fromYear]) {
+      document.querySelectorAll(".chip").forEach((chip) => {
+        chip.addEventListener("click", () => {
+          const u = chip.dataset.user;
+          if (!u) return;
+          input.value = u;
+          load(u);
+        });
+      });
+
+      for (const el of [toggleMarkers, smoothing]) {
         el.addEventListener("change", () => {
-          if (lastData && (el === toggleMarkers || el === toggleRaw)) {
+          if (lastData && el === toggleMarkers) {
             renderChart(lastData);
           } else if (lastData) {
             load(lastData.username);
@@ -845,24 +685,17 @@
       downloadBtn.addEventListener("click", () => {
         if (!chart) return;
         const link = document.createElement("a");
-        link.download = `${(lastData?.username ?? "chart")}-commit-ledger.png`;
+        link.download = `${(lastData?.username ?? "chart")}-contributions.png`;
         link.href = canvas.toDataURL("image/png", 1);
         link.click();
       });
 
-      // Initial empty state
-      setStatus("Enter a GitHub handle above.");
+      setStatus("Enter a GitHub username above.");
 
-      // Load annotation plugin, then pick up ?u= from URL
       const annotationScript = document.createElement("script");
       annotationScript.src = "https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.1.0/dist/chartjs-plugin-annotation.min.js";
       annotationScript.onload = () => {
         Chart.register(window["chartjs-plugin-annotation"]);
-        // Prefetch markers for legend rendering even before first search
-        fetch("/api/markers")
-          .then((r) => r.json())
-          .then((b) => { if (b.markers) renderLegend(b.markers); })
-          .catch(() => {});
         const initial = new URL(window.location.href).searchParams.get("u");
         if (initial) {
           input.value = initial;
