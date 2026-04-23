@@ -376,7 +376,7 @@
         </p>
       </section>
 
-      <form class="search" id="form">
+      <form class="search" id="form" role="search" autocomplete="off">
         <div class="input-wrap">
           <span class="at-symbol">@</span>
           <input
@@ -387,11 +387,13 @@
             autocapitalize="none"
             autocorrect="off"
             spellcheck="false"
+            aria-autocomplete="none"
             data-1p-ignore="true"
             data-lpignore="true"
             data-bwignore="true"
             data-form-type="other"
             placeholder="GitHub username"
+            readonly
             required
           />
         </div>
@@ -692,6 +694,13 @@
           submit.disabled = false;
         }
       }
+
+      // Strip readonly on first interaction. The attribute suppresses Safari's
+      // password-manager autofill popup while leaving the field fully usable
+      // once the user clicks or tabs in.
+      const unlockInput = () => input.removeAttribute("readonly");
+      input.addEventListener("focus", unlockInput, { once: true });
+      input.addEventListener("pointerdown", unlockInput, { once: true });
 
       form.addEventListener("submit", (e) => {
         e.preventDefault();
