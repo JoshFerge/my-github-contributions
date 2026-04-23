@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+  <defs>
+    <style>
+      .sans { font-family: "Helvetica Neue", "Arial", sans-serif; }
+    </style>
+  </defs>
+
+  <rect width="1200" height="630" fill="#f4eede"/>
+
+  <text class="sans" x="80" y="170" font-size="80" font-weight="700" fill="#14110e" letter-spacing="-3">GitHub contributions</text>
+  <text class="sans" x="80" y="264" font-size="80" font-weight="700" fill="#14110e" letter-spacing="-3">in the <tspan fill="#c8344a">AI era</tspan>.</text>
+
+  <text class="sans" x="80" y="322" font-size="26" font-weight="400" fill="#5a5349">Monthly contributions for any public GitHub user, plotted against</text>
+  <text class="sans" x="80" y="356" font-size="26" font-weight="400" fill="#5a5349">when the major AI coding models shipped.</text>
+
+  <g transform="translate(80, 410)">
+    <line x1="0" y1="140" x2="1040" y2="140" stroke="#14110e" stroke-width="1" opacity="0.25"/>
+
+    <line x1="260" y1="0" x2="260" y2="140" stroke="#14110e" stroke-width="1" stroke-dasharray="4 5" opacity="0.4"/>
+    <line x1="450" y1="0" x2="450" y2="140" stroke="#14110e" stroke-width="1" stroke-dasharray="4 5" opacity="0.4"/>
+    <line x1="640" y1="0" x2="640" y2="140" stroke="#14110e" stroke-width="1" stroke-dasharray="4 5" opacity="0.4"/>
+    <line x1="830" y1="0" x2="830" y2="140" stroke="#14110e" stroke-width="1" stroke-dasharray="4 5" opacity="0.4"/>
+
+    <path d="M 0 130 C 80 128, 150 125, 200 120 L 260 112 C 320 106, 390 96, 450 82 C 520 70, 590 56, 640 44 C 720 32, 800 22, 830 18 C 900 12, 970 8, 1040 6 L 1040 140 L 0 140 Z" fill="#c8344a" opacity="0.14"/>
+    <path d="M 0 130 C 80 128, 150 125, 200 120 L 260 112 C 320 106, 390 96, 450 82 C 520 70, 590 56, 640 44 C 720 32, 800 22, 830 18 C 900 12, 970 8, 1040 6" stroke="#c8344a" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+
+  <text class="sans" x="80" y="598" font-size="22" font-weight="600" fill="#14110e">github-contributions.com</text>
+  <text class="sans" x="1120" y="598" text-anchor="end" font-size="22" font-weight="400" fill="#5a5349">made by @joshferge</text>
+</svg>

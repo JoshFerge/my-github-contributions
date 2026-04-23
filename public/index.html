@@ -14,7 +14,15 @@
       content="Paste a GitHub username. See their monthly public contributions since 2021, overlaid with AI coding model launches."
     />
     <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://github-contributions.com/" />
+    <meta property="og:image" content="https://github-contributions.com/og.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
     <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:image" content="https://github-contributions.com/og.png" />
+    <meta name="twitter:site" content="@joshferge" />
+    <meta name="twitter:creator" content="@joshferge" />
+    <link rel="canonical" href="https://github-contributions.com/" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="mask-icon" href="/favicon.svg" color="#c8344a" />
     <meta name="theme-color" content="#f4eede" />
@@ -745,9 +753,18 @@
         });
       }
 
+      function canonicalUrl() {
+        const u = new URL(window.location.href);
+        if (u.hostname.endsWith("github-contributions.com")) {
+          u.hostname = "github-contributions.com";
+          u.protocol = "https:";
+        }
+        return u;
+      }
+
       shareXBtn.addEventListener("click", () => {
         if (!lastData) return;
-        const u = new URL(window.location.href);
+        const u = canonicalUrl();
         u.searchParams.set("u", lastData.username);
         const total = lastData.series.reduce((s, p) => s + p.count, 0);
         const text = `My GitHub contributions since 2021, overlaid with AI coding model launches — ${total.toLocaleString()} contributions across ${lastData.series.length} months.`;
@@ -756,7 +773,7 @@
       });
 
       copyLinkBtn.addEventListener("click", async () => {
-        await navigator.clipboard.writeText(window.location.href);
+        await navigator.clipboard.writeText(canonicalUrl().toString());
         const orig = copyLinkBtn.textContent;
         copyLinkBtn.textContent = "Copied";
         setTimeout(() => (copyLinkBtn.textContent = orig), 1200);

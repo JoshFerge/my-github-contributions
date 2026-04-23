@@ -1,10 +1,9 @@
 # GitHub contributions in the AI era
 
 Chart any public GitHub user's monthly contributions since 2021, overlaid with
-the launch dates of major AI coding tools (Copilot, ChatGPT, GPT-4, Cursor,
-Claude, Claude Code, Codex, etc.).
+the launch dates of major AI coding models (ChatGPT, GPT-4, Claude, etc.).
 
-Live at: https://github-contributions-chart.asdfasdfadsfasdf3323e234.workers.dev
+Live at: **https://github-contributions.com**
 
 Made by [@joshferge](https://x.com/joshferge).
 
@@ -13,10 +12,17 @@ Made by [@joshferge](https://x.com/joshferge).
 A single Cloudflare Worker serves:
 
 - **`/`** — a static `index.html` (from `public/`) rendered by Chart.js with a
-  dashed-rule annotation for each AI tool launch.
-- **`/api/chart?username=<handle>&from=<year>&smoothing=<n>`** — fetches the
-  GitHub GraphQL `contributionsCollection` year-by-year, aggregates into
-  monthly buckets, applies an N-month moving average, and returns JSON.
+  dashed-rule annotation for each AI model launch. Title, subtitle, and total
+  are drawn on the canvas itself so shared/exported PNGs are self-contained.
+- **`/api/chart?username=<handle>&from=<year>`** — fetches the GitHub GraphQL
+  `contributionsCollection` year-by-year, aggregates into monthly buckets, and
+  returns JSON. Smoothing (3-month moving average) is computed client-side so
+  the toggle doesn't require a refetch.
+
+Canonical origin is `https://github-contributions.com`. `http://` and the
+`www.` subdomain are redirected via Cloudflare zone settings (Always Use
+HTTPS + a Redirect Rule) — not via the Worker, so static asset requests
+don't eat a Worker invocation.
 
 Marker dates are a static list hardcoded on the frontend in
 `public/index.html` (the `MARKERS` array). No API call is needed for them.
@@ -71,11 +77,23 @@ creates the Worker; subsequent deploys update it.
 gh auth token | npx wrangler secret put GITHUB_TOKEN
 ```
 
-## Editing AI tool markers
+## Editing AI model markers
 
 Markers live in one place: the `MARKERS` array in `public/index.html`. Each
 entry is `{ date: "YYYY-MM-DD", label: "..." }`. Add, remove, or reword
 entries and `npm run deploy`.
+
+## Social preview image
+
+The OG image served at `/og.png` is rasterized from `scripts/og.svg`. To
+regenerate after editing the SVG:
+
+```bash
+brew install librsvg   # once
+rsvg-convert -w 1200 -h 630 scripts/og.svg -o public/og.png
+```
+
+The favicon (`public/favicon.svg`) is a plain SVG and needs no build step.
 
 ## Share flow
 
