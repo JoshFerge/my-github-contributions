@@ -486,7 +486,6 @@
 
       // AI coding tool launch dates, hardcoded. Edit this list to add/remove markers.
       const MARKERS = [
-        { date: "2022-06-21", label: "Copilot GA" },
         { date: "2022-11-30", label: "ChatGPT launch" },
         { date: "2023-03-14", label: "GPT-4" },
         { date: "2024-06-20", label: "Claude 3.5 Sonnet" },
@@ -553,13 +552,10 @@
 
         const markerAnnotations = {};
         if (toggleMarkers.checked) {
-          let i = 0;
           for (const m of MARKERS) {
             const ym = m.date.slice(0, 7);
             const idx = monthIndex(data.series, ym);
             if (idx === -1) continue;
-            // Alternate label y-position: top, middle, bottom.
-            const position = ["start", "end", "start", "end"][i % 4];
             markerAnnotations[`m-${m.date}`] = {
               type: "line",
               xMin: idx,
@@ -570,7 +566,7 @@
               label: {
                 display: true,
                 content: m.label,
-                position,
+                position: "start",
                 backgroundColor: "rgba(255, 255, 255, 0.96)",
                 color: "#14110e",
                 font: { family: FONT_SANS, size: 11, weight: "500" },
@@ -580,7 +576,6 @@
                 borderRadius: 4,
               },
             };
-            i++;
           }
         }
 
