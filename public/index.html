@@ -421,16 +421,6 @@
       </div>
 
       <section class="chart-card">
-        <div class="chart-head">
-          <h2 class="chart-title" id="chart-title">
-            <span class="muted">Monthly contributions</span>
-          </h2>
-          <div class="chart-stats" id="chart-stats" style="display:none;">
-            <span class="big" id="total-contributions">—</span>
-            total
-          </div>
-        </div>
-
         <div id="chart-wrap">
           <canvas id="chart"></canvas>
           <div id="status"></div>
@@ -463,9 +453,6 @@
       const submit = $("submit");
       const status = $("status");
       const canvas = $("chart");
-      const titleEl = $("chart-title");
-      const statsEl = $("chart-stats");
-      const totalContribEl = $("total-contributions");
       const toggleMarkers = $("toggle-markers");
       const toggleSmoothing = $("toggle-smoothing");
       const SMOOTH_WINDOW = 3;
@@ -520,6 +507,38 @@
       const FONT_SANS = '"Geist", ui-sans-serif, -apple-system, sans-serif';
       const FONT_MONO = '"JetBrains Mono", ui-monospace, monospace';
 
+      // White background so exported PNGs aren't transparent.
+      const whiteBgPlugin = {
+        id: "whiteBg",
+        beforeDraw(chart) {
+          const { ctx } = chart;
+          ctx.save();
+          ctx.globalCompositeOperation = "destination-over";
+          ctx.fillStyle = "#ffffff";
+          ctx.fillRect(0, 0, chart.width, chart.height);
+          ctx.restore();
+        },
+      };
+
+      // Branded footer on exported images so context travels with the image.
+      const watermarkPlugin = {
+        id: "watermark",
+        afterDraw(chart) {
+          const ctx = chart.ctx;
+          ctx.save();
+          ctx.font = `500 11px ${FONT_SANS}`;
+          ctx.fillStyle = "#8a7f70";
+          ctx.textAlign = "right";
+          ctx.textBaseline = "bottom";
+          ctx.fillText(
+            "GitHub contributions in the AI era · made by @joshferge",
+            chart.width - 14,
+            chart.height - 8,
+          );
+          ctx.restore();
+        },
+      };
+
       function renderChart(data) {
         lastData = data;
         setStatus("");
@@ -532,6 +551,7 @@
         const seriesLabel = smoothingOn
           ? "3-month moving average"
           : "monthly contributions";
+        const total = data.series.reduce((s, p) => s + p.count, 0);
 
         const datasets = [
           {
@@ -612,8 +632,27 @@
                 },
               },
             },
+            layout: {
+              padding: { top: 4, right: 12, bottom: 22, left: 4 },
+            },
             plugins: {
               legend: { display: false },
+              title: {
+                display: true,
+                text: `@${data.username} — GitHub contributions`,
+                align: "start",
+                color: "#14110e",
+                font: { family: FONT_SANS, size: 18, weight: "600" },
+                padding: { top: 4, bottom: 2 },
+              },
+              subtitle: {
+                display: true,
+                text: `${total.toLocaleString()} total · ${seriesLabel}`,
+                align: "start",
+                color: "#5a5349",
+                font: { family: FONT_SANS, size: 13, weight: "400" },
+                padding: { top: 0, bottom: 14 },
+              },
               tooltip: {
                 backgroundColor: "#14110e",
                 titleColor: "#f4eede",
@@ -633,16 +672,11 @@
         };
 
         if (chart) chart.destroy();
-        chart = new Chart(canvas, config);
-
-        const total = data.series.reduce((s, p) => s + p.count, 0);
-        titleEl.innerHTML = `
-          <span>@${escapeHtml(data.username)}</span>
-          <span class="muted">· ${seriesLabel}</span>
-        `;
-        statsEl.style.display = "block";
+        chart = new Chart(canvas, {
+          ...config,
+          plugins: [whiteBgPlugin, watermarkPlugin],
+        });
         shareRow.style.display = "flex";
-        totalContribEl.textContent = total.toLocaleString();
       }
 
       function escapeHtml(s) {
@@ -665,7 +699,6 @@
           if (!body.series?.length) {
             setStatus(`No contributions found for @${username}.`, true);
             if (chart) { chart.destroy(); chart = null; }
-            statsEl.style.display = "none";
             shareRow.style.display = "none";
             return;
           }
@@ -677,7 +710,6 @@
         } catch (err) {
           setStatus(err.message || "Something went wrong.", true);
           if (chart) { chart.destroy(); chart = null; }
-          statsEl.style.display = "none";
           shareRow.style.display = "none";
         } finally {
           submit.disabled = false;
