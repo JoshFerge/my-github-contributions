@@ -460,18 +460,18 @@
       const shareXBtn = $("share-x");
       const shareRow = $("share-row");
 
-      // Curated subset — only the most recognizable launches, to keep the chart readable.
-      const KEY_MARKERS = new Set([
-        "2022-06-21", // Copilot GA
-        "2022-11-30", // ChatGPT launch
-        "2023-03-14", // GPT-4
-        "2023-10-10", // Cursor launch
-        "2024-06-20", // Claude 3.5 Sonnet
-        "2025-02-24", // Claude Code preview
-        "2025-05-16", // OpenAI Codex preview
-        "2025-11-24", // Claude Opus 4.5
-        "2026-02-24", // Claude Opus 4.6
-      ]);
+      // AI coding tool launch dates, hardcoded. Edit this list to add/remove markers.
+      const MARKERS = [
+        { date: "2022-06-21", label: "Copilot GA" },
+        { date: "2022-11-30", label: "ChatGPT launch" },
+        { date: "2023-03-14", label: "GPT-4" },
+        { date: "2023-10-10", label: "Cursor launch" },
+        { date: "2024-06-20", label: "Claude 3.5 Sonnet" },
+        { date: "2025-02-24", label: "Claude Code preview" },
+        { date: "2025-05-16", label: "OpenAI Codex preview" },
+        { date: "2025-11-24", label: "Claude Opus 4.5" },
+        { date: "2026-02-24", label: "Claude Opus 4.6" },
+      ];
 
       let chart = null;
       let lastData = null;
@@ -529,10 +529,9 @@
         ];
 
         const markerAnnotations = {};
-        if (toggleMarkers.checked && data.markers) {
+        if (toggleMarkers.checked) {
           let i = 0;
-          for (const m of data.markers) {
-            if (!KEY_MARKERS.has(m.date)) continue;
+          for (const m of MARKERS) {
             const ym = m.date.slice(0, 7);
             const idx = monthIndex(data.series, ym);
             if (idx === -1) continue;

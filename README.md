@@ -16,13 +16,12 @@ A single Cloudflare Worker serves:
   dashed-rule annotation for each AI tool launch.
 - **`/api/chart?username=<handle>&from=<year>&smoothing=<n>`** — fetches the
   GitHub GraphQL `contributionsCollection` year-by-year, aggregates into
-  monthly buckets, applies an N-month moving average, and returns JSON with
-  the series + markers.
-- **`/api/markers`** — just the AI tool launch marker list (used for legend
-  rendering on first paint).
+  monthly buckets, applies an N-month moving average, and returns JSON.
 
-Responses are cached at the Cloudflare edge for 6 hours per `(username, from,
-smoothing)` tuple.
+Marker dates are a static list hardcoded on the frontend in
+`public/index.html` (the `MARKERS` array). No API call is needed for them.
+
+API responses are not cached — every chart request hits GitHub's GraphQL API.
 
 ## Stack
 
@@ -74,17 +73,9 @@ gh auth token | npx wrangler secret put GITHUB_TOKEN
 
 ## Editing AI tool markers
 
-Two places, and they need to stay in sync:
-
-- **`src/index.ts`** — `AI_MARKERS` is the full list returned by the API.
-  Each entry is `{ date: "YYYY-MM-DD", label, category }`.
-- **`public/index.html`** — `KEY_MARKERS` is the curated subset actually
-  rendered on the chart (to avoid label collisions). Add the date of any
-  new marker you want to appear on the chart here too.
-
-After editing markers, `npm run deploy`. The edge cache will still serve old
-chart responses for up to 6 hours — append any dummy query param to bust it
-if you want the new markers to appear immediately.
+Markers live in one place: the `MARKERS` array in `public/index.html`. Each
+entry is `{ date: "YYYY-MM-DD", label: "..." }`. Add, remove, or reword
+entries and `npm run deploy`.
 
 ## Share flow
 
@@ -106,4 +97,4 @@ chart inside the tweet; not built yet.
 
 ## License
 
-No license declared; ask before forking commercially.
+[MIT](./LICENSE).

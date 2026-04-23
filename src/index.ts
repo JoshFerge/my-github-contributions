@@ -14,29 +14,6 @@ interface MonthPoint {
   smoothed: number;
 }
 
-interface Marker {
-  date: string;
-  label: string;
-  category: string;
-}
-
-const AI_MARKERS: Marker[] = [
-  { date: "2021-06-29", label: "Copilot preview", category: "ai_tools" },
-  { date: "2022-06-21", label: "Copilot GA", category: "ai_tools" },
-  { date: "2022-11-30", label: "ChatGPT launch", category: "ai_tools" },
-  { date: "2023-03-14", label: "GPT-4", category: "ai_tools" },
-  { date: "2023-07-11", label: "Claude 2", category: "ai_tools" },
-  { date: "2023-10-10", label: "Cursor launch", category: "ai_tools" },
-  { date: "2024-03-04", label: "Claude 3", category: "ai_tools" },
-  { date: "2024-06-20", label: "Claude 3.5 Sonnet", category: "ai_tools" },
-  { date: "2024-10-22", label: "Claude computer use", category: "ai_tools" },
-  { date: "2025-02-24", label: "Claude 3.7 Sonnet", category: "ai_tools" },
-  { date: "2025-02-24", label: "Claude Code preview", category: "ai_tools" },
-  { date: "2025-05-16", label: "OpenAI Codex preview", category: "ai_tools" },
-  { date: "2025-11-24", label: "Claude Opus 4.5", category: "ai_tools" },
-  { date: "2026-02-24", label: "Claude Opus 4.6", category: "ai_tools" },
-];
-
 const GQL_ENDPOINT = "https://api.github.com/graphql";
 
 // GitHub's contributionsCollection returns at most ~1 year per query.
@@ -61,22 +38,18 @@ const CONTRIB_QUERY = /* GraphQL */ `
 `;
 
 export default {
-  async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
+  async fetch(request: Request, env: Env): Promise<Response> {
     const url = new URL(request.url);
 
     if (url.pathname === "/api/chart") {
-      return handleChart(url, env, ctx);
-    }
-
-    if (url.pathname === "/api/markers") {
-      return json({ markers: AI_MARKERS });
+      return handleChart(url, env);
     }
 
     return env.ASSETS.fetch(request);
   },
 };
 
-async function handleChart(url: URL, env: Env, ctx: ExecutionContext): Promise<Response> {
+async function handleChart(url: URL, env: Env): Promise<Response> {
   const username = (url.searchParams.get("username") || "").trim();
   if (!username || !/^[a-zA-Z0-9-]{1,39}$/.test(username)) {
     return json({ error: "Invalid username" }, 400);
@@ -87,16 +60,7 @@ async function handleChart(url: URL, env: Env, ctx: ExecutionContext): Promise<R
 
   const fromYear = clampYear(url.searchParams.get("from"), 2021);
   const now = new Date();
-  const toYear = now.getUTCFullYear();
   const smoothing = clampInt(url.searchParams.get("smoothing"), 6, 1, 24);
-
-  const cacheKey = new Request(
-    `https://cache.internal/chart?u=${encodeURIComponent(username)}&f=${fromYear}&t=${toYear}&s=${smoothing}`,
-    { method: "GET" },
-  );
-  const cache = caches.default;
-  const cached = await cache.match(cacheKey);
-  if (cached) return cached;
 
   let days: DayContribution[];
   try {
@@ -111,24 +75,21 @@ async function handleChart(url: URL, env: Env, ctx: ExecutionContext): Promise<R
 
   const series = aggregateByMonth(days, smoothing);
 
-  const body = {
-    username,
-    from: `${fromYear}-01-01`,
-    to: isoDate(now),
-    series,
-    markers: AI_MARKERS,
-    meta: {
-      source: "github_contribution_graph",
-      includes_private: false,
-      smoothing_window_months: smoothing,
+  return json(
+    {
+      username,
+      from: `${fromYear}-01-01`,
+      to: isoDate(now),
+      series,
+      meta: {
+        source: "github_contribution_graph",
+        includes_private: false,
+        smoothing_window_months: smoothing,
+      },
     },
-  };
-
-  const response = json(body, 200, {
-    "Cache-Control": "public, s-maxage=21600, max-age=600", // 6h edge, 10m browser
-  });
-  ctx.waitUntil(cache.put(cacheKey, response.clone()));
-  return response;
+    200,
+    { "Cache-Control": "no-store" },
+  );
 }
 
 async function fetchContributionDays(
@@ -149,7 +110,6 @@ async function fetchContributionDays(
     ranges.map((r) => gqlFetchYear(username, r.from, r.to, token)),
   );
 
-  // Dedupe by date (ranges don't overlap, but belt and suspenders).
   const seen = new Map<string, number>();
   for (const daysForYear of perRange) {
     for (const d of daysForYear) seen.set(d.date, d.contributionCount);
@@ -216,7 +176,6 @@ function aggregateByMonth(days: DayContribution[], smoothing: number): MonthPoin
   const months = [...byMonth.keys()].sort();
   if (months.length === 0) return [];
 
-  // Fill gaps so the series is dense.
   const [firstY, firstM] = months[0].split("-").map(Number);
   const [lastY, lastM] = months[months.length - 1].split("-").map(Number);
   const dense: { month: string; count: number }[] = [];
