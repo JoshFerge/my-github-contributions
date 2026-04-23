@@ -427,7 +427,7 @@
           </h2>
           <div class="chart-stats" id="chart-stats" style="display:none;">
             <span class="big" id="total-contributions">—</span>
-            total · <span id="total-months">—</span> months
+            total
           </div>
         </div>
 
@@ -466,7 +466,6 @@
       const titleEl = $("chart-title");
       const statsEl = $("chart-stats");
       const totalContribEl = $("total-contributions");
-      const totalMonthsEl = $("total-months");
       const toggleMarkers = $("toggle-markers");
       const toggleSmoothing = $("toggle-smoothing");
       const SMOOTH_WINDOW = 3;
@@ -652,7 +651,6 @@
         statsEl.style.display = "block";
         shareRow.style.display = "flex";
         totalContribEl.textContent = total.toLocaleString();
-        totalMonthsEl.textContent = data.series.length;
       }
 
       function escapeHtml(s) {
