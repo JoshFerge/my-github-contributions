@@ -37,18 +37,20 @@ const CONTRIB_QUERY = /* GraphQL */ `
 `;
 
 export default {
-  async fetch(request: Request, env: Env): Promise<Response> {
+  async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
     const url = new URL(request.url);
 
     if (url.pathname === "/api/chart") {
-      return handleChart(url, env);
+      return handleChart(url, env, ctx);
     }
 
     return env.ASSETS.fetch(request);
   },
 };
 
-async function handleChart(url: URL, env: Env): Promise<Response> {
+const EDGE_CACHE_SECONDS = 3600; // 1 hour
+
+async function handleChart(url: URL, env: Env, ctx: ExecutionContext): Promise<Response> {
   const username = (url.searchParams.get("username") || "").trim();
   if (!username || !/^[a-zA-Z0-9-]{1,39}$/.test(username)) {
     return json({ error: "Invalid username" }, 400);
@@ -59,6 +61,14 @@ async function handleChart(url: URL, env: Env): Promise<Response> {
 
   const fromYear = clampYear(url.searchParams.get("from"), 2021);
   const now = new Date();
+
+  const cacheKey = new Request(
+    `https://cache.internal/chart?u=${encodeURIComponent(username.toLowerCase())}&f=${fromYear}`,
+    { method: "GET" },
+  );
+  const cache = caches.default;
+  const cached = await cache.match(cacheKey);
+  if (cached) return cached;
 
   let days: DayContribution[];
   try {
@@ -73,7 +83,7 @@ async function handleChart(url: URL, env: Env): Promise<Response> {
 
   const series = aggregateByMonth(days);
 
-  return json(
+  const response = json(
     {
       username,
       from: `${fromYear}-01-01`,
@@ -85,8 +95,10 @@ async function handleChart(url: URL, env: Env): Promise<Response> {
       },
     },
     200,
-    { "Cache-Control": "no-store" },
+    { "Cache-Control": `public, s-maxage=${EDGE_CACHE_SECONDS}, max-age=300` },
   );
+  ctx.waitUntil(cache.put(cacheKey, response.clone()));
+  return response;
 }
 
 async function fetchContributionDays(

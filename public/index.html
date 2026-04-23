@@ -343,17 +343,6 @@
         color: var(--ink);
         background: rgba(20, 17, 14, 0.04);
       }
-      .share-row button.primary {
-        background: var(--ink);
-        border-color: var(--ink);
-        color: #fff;
-        display: inline-flex;
-        align-items: center;
-      }
-      .share-row button.primary:hover {
-        background: #000;
-        color: #fff;
-      }
 
       /* ---------- Footer ---------- */
       footer {
@@ -438,10 +427,6 @@
         </div>
 
         <div class="share-row" id="share-row" style="display:none;">
-          <button type="button" id="share-x" class="primary">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" style="margin-right:6px;vertical-align:-2px;"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
-            Share
-          </button>
           <button type="button" id="copy-link">Copy link</button>
           <button type="button" id="copy-image">Copy image</button>
           <button type="button" id="download-png">Download PNG</button>
@@ -479,7 +464,6 @@
       const copyLinkBtn = $("copy-link");
       const copyImageBtn = $("copy-image");
       const downloadBtn = $("download-png");
-      const shareXBtn = $("share-x");
       const shareRow = $("share-row");
 
       // AI coding model launch dates, hardcoded. Edit this list to add/remove markers.
@@ -762,17 +746,7 @@
         return u;
       }
 
-      shareXBtn.addEventListener("click", () => {
-        if (!lastData) return;
-        const u = canonicalUrl();
-        u.searchParams.set("u", lastData.username);
-        const total = lastData.series.reduce((s, p) => s + p.count, 0);
-        const text = `My GitHub contributions since 2021, overlaid with AI coding model launches — ${total.toLocaleString()} contributions across ${lastData.series.length} months.`;
-        const intent = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(u.toString())}`;
-        window.open(intent, "_blank", "noopener,noreferrer");
-      });
-
-      copyLinkBtn.addEventListener("click", async () => {
+copyLinkBtn.addEventListener("click", async () => {
         await navigator.clipboard.writeText(canonicalUrl().toString());
         const orig = copyLinkBtn.textContent;
         copyLinkBtn.textContent = "Copied";
