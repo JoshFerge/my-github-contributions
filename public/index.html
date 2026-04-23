@@ -110,7 +110,7 @@
         color: var(--ink-faint);
         font-weight: 500;
       }
-      input[type="text"] {
+      input[type="search"] {
         flex: 1;
         border: 0;
         background: transparent;
@@ -122,10 +122,19 @@
         padding: 16px 0;
         outline: none;
         min-width: 0;
+        -webkit-appearance: none;
+        appearance: none;
       }
-      input[type="text"]::placeholder {
+      input[type="search"]::placeholder {
         color: var(--ink-faint);
         font-weight: 400;
+      }
+      input[type="search"]::-webkit-search-decoration,
+      input[type="search"]::-webkit-search-cancel-button,
+      input[type="search"]::-webkit-search-results-button,
+      input[type="search"]::-webkit-search-results-decoration {
+        -webkit-appearance: none;
+        display: none;
       }
       button[type="submit"] {
         border: 0;
@@ -372,10 +381,16 @@
           <span class="at-symbol">@</span>
           <input
             id="username"
-            type="text"
+            name="gh-handle"
+            type="search"
             autocomplete="off"
             autocapitalize="none"
+            autocorrect="off"
             spellcheck="false"
+            data-1p-ignore="true"
+            data-lpignore="true"
+            data-bwignore="true"
+            data-form-type="other"
             placeholder="GitHub username"
             required
           />
