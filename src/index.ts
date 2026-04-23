@@ -33,6 +33,8 @@ const AI_MARKERS: Marker[] = [
   { date: "2025-02-24", label: "Claude 3.7 Sonnet", category: "ai_tools" },
   { date: "2025-02-24", label: "Claude Code preview", category: "ai_tools" },
   { date: "2025-05-16", label: "OpenAI Codex preview", category: "ai_tools" },
+  { date: "2025-11-24", label: "Claude Opus 4.5", category: "ai_tools" },
+  { date: "2026-02-24", label: "Claude Opus 4.6", category: "ai_tools" },
 ];
 
 const GQL_ENDPOINT = "https://api.github.com/graphql";
