@@ -520,24 +520,6 @@
         },
       };
 
-      // Branded footer on exported images so context travels with the image.
-      const watermarkPlugin = {
-        id: "watermark",
-        afterDraw(chart) {
-          const ctx = chart.ctx;
-          ctx.save();
-          ctx.font = `500 11px ${FONT_SANS}`;
-          ctx.fillStyle = "#8a7f70";
-          ctx.textAlign = "right";
-          ctx.textBaseline = "bottom";
-          ctx.fillText(
-            "GitHub contributions in the AI era · made by @joshferge",
-            chart.width - 14,
-            chart.height - 8,
-          );
-          ctx.restore();
-        },
-      };
 
       function renderChart(data) {
         lastData = data;
@@ -633,7 +615,7 @@
               },
             },
             layout: {
-              padding: { top: 4, right: 12, bottom: 22, left: 4 },
+              padding: { top: 4, right: 12, bottom: 4, left: 4 },
             },
             plugins: {
               legend: { display: false },
@@ -647,7 +629,7 @@
               },
               subtitle: {
                 display: true,
-                text: `${total.toLocaleString()} total · ${seriesLabel}`,
+                text: seriesLabel,
                 align: "start",
                 color: "#5a5349",
                 font: { family: FONT_SANS, size: 13, weight: "400" },
@@ -671,10 +653,32 @@
           },
         };
 
+        // Right-aligned total, drawn at the title's baseline.
+        const totalStatPlugin = {
+          id: "totalStat",
+          afterDraw(chart) {
+            const ctx = chart.ctx;
+            ctx.save();
+            ctx.textAlign = "right";
+            ctx.textBaseline = "top";
+            const x = chart.width - 14;
+            const y = 6;
+            const numStr = total.toLocaleString();
+            ctx.font = `600 18px ${FONT_SANS}`;
+            ctx.fillStyle = "#14110e";
+            const numWidth = ctx.measureText(numStr).width;
+            ctx.fillText(numStr, x, y);
+            ctx.font = `400 13px ${FONT_SANS}`;
+            ctx.fillStyle = "#5a5349";
+            ctx.fillText("total", x - numWidth - 6, y + 5);
+            ctx.restore();
+          },
+        };
+
         if (chart) chart.destroy();
         chart = new Chart(canvas, {
           ...config,
-          plugins: [whiteBgPlugin, watermarkPlugin],
+          plugins: [whiteBgPlugin, totalStatPlugin],
         });
         shareRow.style.display = "flex";
       }
