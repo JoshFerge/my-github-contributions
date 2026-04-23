@@ -468,7 +468,16 @@
       const totalMonthsEl = $("total-months");
       const toggleMarkers = $("toggle-markers");
       const toggleSmoothing = $("toggle-smoothing");
-      const smoothingValue = () => (toggleSmoothing.checked ? "3" : "1");
+      const SMOOTH_WINDOW = 3;
+
+      function computeSmoothed(series, window) {
+        return series.map((_, i) => {
+          const start = Math.max(0, i - window + 1);
+          const w = series.slice(start, i + 1);
+          const avg = w.reduce((s, p) => s + p.count, 0) / w.length;
+          return Math.round(avg * 10) / 10;
+        });
+      }
       const copyLinkBtn = $("copy-link");
       const copyImageBtn = $("copy-image");
       const downloadBtn = $("download-png");
@@ -519,17 +528,19 @@
         lastData = data;
         setStatus("");
         const labels = data.series.map((p) => monthLabel(p.month));
-        const smoothed = data.series.map((p) => p.smoothed);
+        const smoothingOn = toggleSmoothing.checked;
+        const values = smoothingOn
+          ? computeSmoothed(data.series, SMOOTH_WINDOW)
+          : data.series.map((p) => p.count);
 
-        const smoothingVal = smoothingValue();
-        const seriesLabel = smoothingVal === "1"
-          ? "monthly contributions"
-          : "3-month moving average";
+        const seriesLabel = smoothingOn
+          ? "3-month moving average"
+          : "monthly contributions";
 
         const datasets = [
           {
             label: seriesLabel,
-            data: smoothed,
+            data: values,
             borderColor: "#c8344a",
             backgroundColor: "rgba(200, 52, 74, 0.1)",
             fill: true,
@@ -656,7 +667,6 @@
           const params = new URLSearchParams({
             username,
             from: "2021",
-            smoothing: smoothingValue(),
           });
           const res = await fetch(`/api/chart?${params}`);
           const body = await res.json();
@@ -701,12 +711,7 @@
 
       for (const el of [toggleMarkers, toggleSmoothing]) {
         el.addEventListener("change", () => {
-          if (!lastData) return;
-          if (el === toggleMarkers) {
-            renderChart(lastData);
-          } else {
-            load(lastData.username);
-          }
+          if (lastData) renderChart(lastData);
         });
       }
 

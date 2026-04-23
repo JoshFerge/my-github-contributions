@@ -11,7 +11,6 @@ interface DayContribution {
 interface MonthPoint {
   month: string; // YYYY-MM
   count: number;
-  smoothed: number;
 }
 
 const GQL_ENDPOINT = "https://api.github.com/graphql";
@@ -60,7 +59,6 @@ async function handleChart(url: URL, env: Env): Promise<Response> {
 
   const fromYear = clampYear(url.searchParams.get("from"), 2021);
   const now = new Date();
-  const smoothing = clampInt(url.searchParams.get("smoothing"), 6, 1, 24);
 
   let days: DayContribution[];
   try {
@@ -73,7 +71,7 @@ async function handleChart(url: URL, env: Env): Promise<Response> {
     return json({ error: msg }, 502);
   }
 
-  const series = aggregateByMonth(days, smoothing);
+  const series = aggregateByMonth(days);
 
   return json(
     {
@@ -84,7 +82,6 @@ async function handleChart(url: URL, env: Env): Promise<Response> {
       meta: {
         source: "github_contribution_graph",
         includes_private: false,
-        smoothing_window_months: smoothing,
       },
     },
     200,
@@ -166,7 +163,7 @@ async function gqlFetchYear(
   return weeks.flatMap((w) => w.contributionDays);
 }
 
-function aggregateByMonth(days: DayContribution[], smoothing: number): MonthPoint[] {
+function aggregateByMonth(days: DayContribution[]): MonthPoint[] {
   const byMonth = new Map<string, number>();
   for (const d of days) {
     const key = d.date.slice(0, 7);
@@ -178,7 +175,7 @@ function aggregateByMonth(days: DayContribution[], smoothing: number): MonthPoin
 
   const [firstY, firstM] = months[0].split("-").map(Number);
   const [lastY, lastM] = months[months.length - 1].split("-").map(Number);
-  const dense: { month: string; count: number }[] = [];
+  const dense: MonthPoint[] = [];
   let y = firstY;
   let m = firstM;
   while (y < lastY || (y === lastY && m <= lastM)) {
@@ -190,15 +187,7 @@ function aggregateByMonth(days: DayContribution[], smoothing: number): MonthPoin
       y++;
     }
   }
-
-  const out: MonthPoint[] = [];
-  for (let i = 0; i < dense.length; i++) {
-    const windowStart = Math.max(0, i - smoothing + 1);
-    const window = dense.slice(windowStart, i + 1);
-    const avg = window.reduce((s, p) => s + p.count, 0) / window.length;
-    out.push({ month: dense[i].month, count: dense[i].count, smoothed: round1(avg) });
-  }
-  return out;
+  return dense;
 }
 
 function json(data: unknown, status = 200, extraHeaders: Record<string, string> = {}): Response {
@@ -219,16 +208,6 @@ function clampYear(v: string | null, fallback: number): number {
   return Math.min(Math.max(n, 2008), nowY);
 }
 
-function clampInt(v: string | null, fallback: number, min: number, max: number): number {
-  const n = v ? parseInt(v, 10) : NaN;
-  if (!Number.isFinite(n)) return fallback;
-  return Math.min(Math.max(n, min), max);
-}
-
 function isoDate(d: Date): string {
   return d.toISOString().slice(0, 10);
-}
-
-function round1(n: number): number {
-  return Math.round(n * 10) / 10;
 }
