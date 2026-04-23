@@ -3,12 +3,12 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>GitHub contributions × AI tool launches</title>
+    <title>GitHub contributions in the AI era</title>
     <meta
       name="description"
       content="Chart any GitHub user's monthly contributions, overlaid with the launch dates of major AI coding tools."
     />
-    <meta property="og:title" content="GitHub contributions × AI tool launches" />
+    <meta property="og:title" content="GitHub contributions in the AI era" />
     <meta
       property="og:description"
       content="Paste a GitHub username. See their monthly contributions since 2021, overlaid with AI tool launches."
@@ -361,7 +361,7 @@
   <body>
     <main>
       <section class="hero">
-        <h1>GitHub contributions × AI tool launches</h1>
+        <h1>GitHub contributions in the AI era</h1>
         <p class="tagline">
           Chart any GitHub user's monthly contributions since 2021, overlaid with when the major AI coding tools shipped.
         </p>
@@ -658,7 +658,7 @@
           const u = new URL(window.location.href);
           u.searchParams.set("u", username);
           history.replaceState(null, "", u.toString());
-          document.title = `@${username} — GitHub contributions × AI tools`;
+          document.title = `@${username} — GitHub contributions in the AI era`;
         } catch (err) {
           setStatus(err.message || "Something went wrong.", true);
           if (chart) { chart.destroy(); chart = null; }
