@@ -6,12 +6,12 @@
     <title>GitHub contributions in the AI era</title>
     <meta
       name="description"
-      content="Chart any GitHub user's monthly contributions, overlaid with the launch dates of major AI coding models."
+      content="Chart any GitHub user's monthly public contributions, overlaid with the launch dates of major AI coding models."
     />
     <meta property="og:title" content="GitHub contributions in the AI era" />
     <meta
       property="og:description"
-      content="Paste a GitHub username. See their monthly contributions since 2021, overlaid with AI coding model launches."
+      content="Paste a GitHub username. See their monthly public contributions since 2021, overlaid with AI coding model launches."
     />
     <meta property="og:type" content="website" />
     <meta name="twitter:card" content="summary_large_image" />
@@ -373,7 +373,7 @@
       <section class="hero">
         <h1>GitHub contributions in the AI era</h1>
         <p class="tagline">
-          Chart any GitHub user's monthly contributions since 2021, overlaid with when the major AI coding models shipped.
+          Chart any GitHub user's monthly public contributions since 2021, overlaid with when the major AI coding models shipped.
         </p>
       </section>
 
@@ -532,7 +532,7 @@
 
         const seriesLabel = smoothingOn
           ? "3-month moving average"
-          : "monthly contributions";
+          : "monthly public contributions";
         const total = data.series.reduce((s, p) => s + p.count, 0);
 
         const datasets = [
