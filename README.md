@@ -19,15 +19,12 @@ A single Cloudflare Worker serves:
   returns JSON. Smoothing (3-month moving average) is computed client-side so
   the toggle doesn't require a refetch.
 
-Canonical origin is `https://github-contributions.com`. `http://` and the
-`www.` subdomain are redirected via Cloudflare zone settings (Always Use
-HTTPS + a Redirect Rule) — not via the Worker, so static asset requests
-don't eat a Worker invocation.
-
 Marker dates are a static list hardcoded on the frontend in
 `public/index.html` (the `MARKERS` array). No API call is needed for them.
 
-API responses are not cached — every chart request hits GitHub's GraphQL API.
+`/api/chart` responses are cached at the Cloudflare edge for 1 hour per
+`(username, from-year)` so a burst of traffic doesn't eat through the
+GitHub GraphQL rate limit.
 
 ## Stack
 
@@ -108,10 +105,6 @@ Buttons appear once a chart renders:
   `ClipboardItem`). Falls back to a file download if the clipboard is
   unavailable.
 - **Download PNG** — direct download.
-
-X intents don't support attaching media — that requires the X API with OAuth.
-The viral-ready path is an OG image endpoint so the permalink unfurls to the
-chart inside the tweet; not built yet.
 
 ## License
 
