@@ -717,15 +717,35 @@
         if (!chart) return;
         const orig = copyImageBtn.textContent;
         try {
-          const blob = await new Promise((resolve, reject) =>
-            canvas.toBlob((b) => (b ? resolve(b) : reject(new Error("no blob"))), "image/png"),
-          );
-          await navigator.clipboard.write([new ClipboardItem({ "image/png": blob })]);
+          if (typeof ClipboardItem === "undefined" || !navigator.clipboard?.write) {
+            throw new Error("Clipboard API unavailable");
+          }
+          // Safari requires the Promise to be passed directly so the user-gesture
+          // chain isn't broken by awaiting the blob first.
+          const blobPromise = new Promise((resolve, reject) => {
+            canvas.toBlob(
+              (b) => (b ? resolve(b) : reject(new Error("toBlob returned null"))),
+              "image/png",
+            );
+          });
+          await navigator.clipboard.write([
+            new ClipboardItem({ "image/png": blobPromise }),
+          ]);
           copyImageBtn.textContent = "Copied";
         } catch (err) {
-          copyImageBtn.textContent = "Copy failed";
+          console.error("Copy image failed:", err);
+          // Fallback: download the PNG so the user still gets the image.
+          try {
+            const link = document.createElement("a");
+            link.download = `${(lastData?.username ?? "chart")}-contributions.png`;
+            link.href = canvas.toDataURL("image/png", 1);
+            link.click();
+            copyImageBtn.textContent = "Downloaded";
+          } catch {
+            copyImageBtn.textContent = "Copy failed";
+          }
         }
-        setTimeout(() => (copyImageBtn.textContent = orig), 1200);
+        setTimeout(() => (copyImageBtn.textContent = orig), 1600);
       });
 
       downloadBtn.addEventListener("click", () => {
