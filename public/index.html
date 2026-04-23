@@ -388,13 +388,8 @@
           AI tool markers
         </label>
         <label>
-          Smoothing
-          <select id="smoothing">
-            <option value="1">off</option>
-            <option value="3">3 mo</option>
-            <option value="6" selected>6 mo</option>
-            <option value="12">12 mo</option>
-          </select>
+          <input type="checkbox" id="toggle-smoothing" checked />
+          Smooth (3-mo avg)
         </label>
       </div>
 
@@ -441,7 +436,8 @@
       const totalContribEl = $("total-contributions");
       const totalMonthsEl = $("total-months");
       const toggleMarkers = $("toggle-markers");
-      const smoothing = $("smoothing");
+      const toggleSmoothing = $("toggle-smoothing");
+      const smoothingValue = () => (toggleSmoothing.checked ? "3" : "1");
       const copyLinkBtn = $("copy-link");
       const downloadBtn = $("download-png");
       const shareRow = $("share-row");
@@ -490,10 +486,10 @@
         const labels = data.series.map((p) => monthLabel(p.month));
         const smoothed = data.series.map((p) => p.smoothed);
 
-        const smoothingVal = smoothing.value;
+        const smoothingVal = smoothingValue();
         const seriesLabel = smoothingVal === "1"
           ? "monthly contributions"
-          : `${smoothingVal}-mo moving avg`;
+          : "3-mo moving avg";
 
         const datasets = [
           {
@@ -626,7 +622,7 @@
           const params = new URLSearchParams({
             username,
             from: "2021",
-            smoothing: smoothing.value,
+            smoothing: smoothingValue(),
           });
           const res = await fetch(`/api/chart?${params}`);
           const body = await res.json();
@@ -669,11 +665,12 @@
         });
       });
 
-      for (const el of [toggleMarkers, smoothing]) {
+      for (const el of [toggleMarkers, toggleSmoothing]) {
         el.addEventListener("change", () => {
-          if (lastData && el === toggleMarkers) {
+          if (!lastData) return;
+          if (el === toggleMarkers) {
             renderChart(lastData);
-          } else if (lastData) {
+          } else {
             load(lastData.username);
           }
         });
