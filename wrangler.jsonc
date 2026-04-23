@@ -11,7 +11,11 @@
   },
   "observability": {
     "enabled": true
-  }
+  },
+  "routes": [
+    { "pattern": "github-contributions.com", "custom_domain": true },
+    { "pattern": "www.github-contributions.com", "custom_domain": true }
+  ]
   // Secrets (set via `wrangler secret put`):
   //   GITHUB_TOKEN  - PAT for GitHub GraphQL API
 }
