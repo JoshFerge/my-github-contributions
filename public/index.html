@@ -426,6 +426,7 @@
             Share on X
           </button>
           <button type="button" id="copy-link">Copy link</button>
+          <button type="button" id="copy-image">Copy image</button>
           <button type="button" id="download-png">Download PNG</button>
         </div>
       </section>
@@ -454,6 +455,7 @@
       const toggleSmoothing = $("toggle-smoothing");
       const smoothingValue = () => (toggleSmoothing.checked ? "3" : "1");
       const copyLinkBtn = $("copy-link");
+      const copyImageBtn = $("copy-image");
       const downloadBtn = $("download-png");
       const shareXBtn = $("share-x");
       const shareRow = $("share-row");
@@ -709,6 +711,21 @@
         const orig = copyLinkBtn.textContent;
         copyLinkBtn.textContent = "Copied";
         setTimeout(() => (copyLinkBtn.textContent = orig), 1200);
+      });
+
+      copyImageBtn.addEventListener("click", async () => {
+        if (!chart) return;
+        const orig = copyImageBtn.textContent;
+        try {
+          const blob = await new Promise((resolve, reject) =>
+            canvas.toBlob((b) => (b ? resolve(b) : reject(new Error("no blob"))), "image/png"),
+          );
+          await navigator.clipboard.write([new ClipboardItem({ "image/png": blob })]);
+          copyImageBtn.textContent = "Copied";
+        } catch (err) {
+          copyImageBtn.textContent = "Copy failed";
+        }
+        setTimeout(() => (copyImageBtn.textContent = orig), 1200);
       });
 
       downloadBtn.addEventListener("click", () => {
