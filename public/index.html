@@ -552,6 +552,9 @@
           options: {
             responsive: true,
             maintainAspectRatio: false,
+            animation: false,
+            animations: { colors: false, x: false, y: false },
+            transitions: { active: { animation: { duration: 0 } } },
             interaction: { mode: "index", intersect: false },
             scales: {
               x: {
